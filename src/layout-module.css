@@ -1,0 +1,17 @@
+.mainLayout .avatar {
+    height: 32px;
+    background: rgba(255,255,255,.2);
+    margin: 16px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.mainLayout .layoutHeader {
+    padding-left: 50px;
+    font-size: 20pt;
+    font-weight: 600;
+    padding-top: 10px;
+    padding-bottom: 20px;
+    height: 80px;
+}
