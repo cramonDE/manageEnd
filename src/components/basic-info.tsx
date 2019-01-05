@@ -1,11 +1,12 @@
 import * as React from 'react';
 
-import {message, Switch, Slider, InputNumber, Row, Col, Button, List, Card } from 'antd';
+import { Switch, Slider, InputNumber, Row, Col, Modal, Button, Select, List, Card } from 'antd';
 import { ColumnProps } from 'antd/lib/table';
 
-import { SavingRecordTable, ISavingRecord } from 'src/components/info-table';
+import { SavingRecordTable, ISavingRecord } from './info-table';
 
-class Withdraw extends React.Component {
+
+class BasicInfo extends React.Component {
     public state = {
         inputValue: 1,
         modelVisible: false,
@@ -83,10 +84,10 @@ class Withdraw extends React.Component {
 
 
 
-    public onWithdraw = () => {
-
-        message.success(`取出金额 ${this.state.inputValue} 元`);
-          
+    public showModal = () => {
+        this.setState({
+            modelVisible: true,
+        });
     }
     public handleOk = () => {
         this.setState({
@@ -132,7 +133,7 @@ class Withdraw extends React.Component {
         const { inputValue } = this.state;
         return (
             <div className="BasicSaving">
-                <p className="contentTitle">取出金额</p>
+                <p className="contentTitle">存入金额</p>
                 <Row>
                     <Col span={8}>
                         <Slider
@@ -152,10 +153,27 @@ class Withdraw extends React.Component {
                         />
                     </Col>
                 </Row>
-                <Button style={{ marginTop: '20px' }} type="primary" onClick={this.onWithdraw}>
-                    取款
+                <div style={{ marginTop: '20px', marginBottom: '10px' }}>
+                    <Select defaultValue="选择开户行" onChange={this.onBankChange} style={{ width: 170 }}>
+                        <Select.Option value="ICBC">中国工商银行</Select.Option>
+                        <Select.Option value="CCB">中国建设银行</Select.Option>
+                        <Select.Option value="BC">中国银行</Select.Option>
+                        <Select.Option value="ABC">中国农业银行</Select.Option>
+                        <Select.Option value="CMB">招商银行</Select.Option>
+                    </Select>
+                </div>
+                <Button style={{ marginTop: '20px' }} type="primary" onClick={this.showModal}>
+                    存款
                 </Button>
-                <p className="contentTitle">取款记录</p>
+                <Modal
+                    title="存款"
+                    visible={this.state.modelVisible}
+                    onOk={this.handleOk}
+                    onCancel={this.handleCancel}
+                >
+                    <p>确认存入金额为{inputValue}元</p>
+                </Modal>
+                <p className="contentTitle">存款记录</p>
                 <SavingRecordTable
                     rowKey="key"
                     dataSource={this.dataSource}
@@ -183,4 +201,4 @@ class Withdraw extends React.Component {
     }
 }
 
-export default Withdraw;
+export default BasicInfo;

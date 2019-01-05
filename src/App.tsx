@@ -1,7 +1,7 @@
 import * as React from 'react';
 import './App.css';
 
-import LayoutModule from './layout-module'
+import LayoutModule from './layout-module';
 
 class App extends React.Component {
     public render() {

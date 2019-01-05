@@ -1,10 +1,21 @@
 {
     "extends": [
-        "tslint:latest",
-        "tslint-react"
+        "tslint:recommended",
+        "tslint-react",
+        "tslint-config-prettier"
     ],
     "rules": {
-        // override tslint-react rules here
-        "jsx-wrap-multiline": false
+        "ordered-imports": false,
+        "object-literal-sort-keys": false,
+        "no-console": false,
+        "semicolon":true,
+        "max-classes-per-file": false
+    },
+    "linterOptions": {
+        "exclude": [
+            "config/**/*.js",
+            "node_modules/**/*.ts",
+            "coverage/lcov-report/*.js"
+        ]
     }
 }
