@@ -6,9 +6,19 @@ export interface ISavingRecord {
     account: string;
     bank: string;
     amount: number;
-    saveTime: string;
-    saveType: boolean;
-    moneyType: boolean;
+    save_time: string;
+    // saveType: boolean;
+    money_type: string;
+}
+
+export interface IWithDrawRecord {
+    key: number;
+    name: string;
+    account: string;
+    amount: number;
+    withdraw_time: string;
+    // saveType: boolean;
+    money_type: string;
 }
 
 export interface IAmountInfo {
@@ -19,7 +29,7 @@ export interface IAmountInfo {
     overdraftAmount: number;
     overdraftInterest: number;
 }
-
+export class WithDrawRecordTable extends Table<IWithDrawRecord> {}
 export class SavingRecordTable extends Table<ISavingRecord> {}
 export class AmountInfoTable extends Table<IAmountInfo> {}
 

@@ -1,59 +1,38 @@
 import * as React from 'react';
 
-import {message, Switch, Slider, InputNumber, Row, Col, Button, List, Card } from 'antd';
+import { message, Switch, Slider, InputNumber, Row, Col, Button, List, Card } from 'antd';
 import { ColumnProps } from 'antd/lib/table';
+import axios from 'axios';
 
-import { SavingRecordTable, ISavingRecord } from 'src/components/info-table';
+import { WithDrawRecordTable, IWithDrawRecord } from 'src/components/info-table';
 
 class Withdraw extends React.Component {
     public state = {
         inputValue: 1,
         modelVisible: false,
         switchVisible: false,
-        bank: 'ICBC'
     };
 
     private amountData = [
         {
-            title: '账号'
+            title: '账号',
+            name: 'account',
+            value: ''
         },
         {
-            title: '余额'
+            title: '余额',
+            name: 'amount',
+            value: 0
         },
         {
-            title: '当前利率'
+            title: '当前利率',
+            name: 'interest',
+            value: 0
         }
     ];
 
-    private dataSource: ISavingRecord[] = [{
-        key: 0,
-        name: 'Jack',
-        account: '123456789',
-        bank: 'ICBC',
-        amount: 50000,
-        saveTime: '2019/01/04',
-        saveType: true,
-        moneyType: true
-    }, {
-        key: 1,
-        name: 'Jack',
-        account: '123456789',
-        bank: 'ICBC',
-        amount: 50000,
-        saveTime: '2019/01/04',
-        saveType: true,
-        moneyType: true
-    }, {
-        key: 2,
-        name: 'Jack',
-        account: '123456789',
-        bank: 'ICBC',
-        amount: 50000,
-        saveTime: '2019/01/04',
-        saveType: true,
-        moneyType: true
-    }];
-    private columns: Array<ColumnProps<ISavingRecord>> = [{
+    private dataSource: IWithDrawRecord[] = [];
+    private columns: Array<ColumnProps<IWithDrawRecord>> = [{
         key: 'name',
         title: '储户姓名',
         dataIndex: 'name',
@@ -64,51 +43,72 @@ class Withdraw extends React.Component {
         dataIndex: 'account',
     },
     {
-        key: 'bank',
-        title: '开户行',
-        dataIndex: 'bank',
-    },
-    {
         key: 'amount',
         title: '金额',
         dataIndex: 'amount',
     },
     {
-        key: 'saveTime',
-        title: '存入时间',
-        dataIndex: 'saveTime',
+        key: 'withdraw_time',
+        title: '取出时间',
+        dataIndex: 'withdraw_time',
+    },
+    {
+        key: 'money_type',
+        title: '币种',
+        dataIndex: 'money_type',
     },
     ];
 
 
-
+    public componentDidMount() {
+        axios.get(`/balance/440583199606252333`).then((res: any) => {
+            if (null === res.data) {
+                return;
+            }
+            this.amountData.map((item: any) => {
+                item.value = res.data[item.name];
+            });
+        });
+        axios.get('/withdraw-record/440583199606252333').then((res: any) => {
+            if (null === res.data) {
+                return;
+            }
+            res.data.map((item: any, index: number) => {
+                this.dataSource.push(item);
+                this.dataSource[index].key = index;
+            });
+            console.log(this.dataSource);
+            this.setState({});
+        });
+    }
 
     public onWithdraw = () => {
+        if (Number(this.amountData[1].value) > this.state.inputValue) {
+            const withdrawRecord = {
+                key: this.dataSource.length,
+                name: '小李',
+                account: '440583199606252333',
+                amount: this.state.inputValue,
+                withdraw_time: '2019/01/05',
+                money_type: '人民币'
+            };
+            axios.post('/withdraw-record/440583199606252333', withdrawRecord).then((res) => {
+                if (res.data) {
+                    this.dataSource.push(withdrawRecord);
+                    this.amountData[1].value = Number(this.amountData[1].value) - this.state.inputValue;
+                    message.success(`取出金额 ${this.state.inputValue} 元`);
+                    this.setState({});      
+                } else {
+                    message.success('操作失败');
+                }
+            });
+        } else {
+            message.error('操作失败');
+            
+        }
 
-        message.success(`取出金额 ${this.state.inputValue} 元`);
-          
     }
-    public handleOk = () => {
-        this.setState({
-            modelVisible: false,
-        });
-        this.dataSource.push({
-            key: this.dataSource.length,
-            name: 'Jack',
-            account: '123456789',
-            bank: 'ICBC',
-            amount: this.state.inputValue,
-            saveTime: '2019/01/04',
-            saveType: true,
-            moneyType: true
-        });
-    }
-
-    public handleCancel = () => {
-        this.setState({
-            modelVisible: false,
-        });
-    }
+    
     public onSwitchChange = (checked: boolean) => {
         console.log(`switch to ${checked}`);
         this.setState({
@@ -120,13 +120,6 @@ class Withdraw extends React.Component {
             inputValue: value,
         });
     }
-
-    public onBankChange = (value: string) => {
-        this.setState({
-            bank: value
-        });
-    }
-
 
     public render() {
         const { inputValue } = this.state;
@@ -156,12 +149,12 @@ class Withdraw extends React.Component {
                     取款
                 </Button>
                 <p className="contentTitle">取款记录</p>
-                <SavingRecordTable
+                <WithDrawRecordTable
                     rowKey="key"
                     dataSource={this.dataSource}
                     columns={this.columns}
                 />
-                <div style={{marginBottom : '15px'}} >
+                <div style={{ marginBottom: '15px' }} >
                     <span className="contentTitle">账户存款信息</span>
                     <Switch onChange={this.onSwitchChange} style={{ marginLeft: '20px', bottom: '2px' }} />
                 </div>
@@ -178,8 +171,8 @@ class Withdraw extends React.Component {
     }
     private renderCard = (item: any) => {
         return (<List.Item>
-                <Card title={item.title}>Card content</Card>
-            </List.Item>);
+            <Card title={item.title}>{item.value}</Card>
+        </List.Item>);
     }
 }
 
